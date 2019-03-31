@@ -17,7 +17,6 @@ class App extends React.Component {
         const{params} = this.props.match;
         //first reinstate our localStorage
         const localStorageRef = localStorage.getItem(params.storeId);
-        console.log(localStorageRef);
         if(localStorageRef){
             this.setState({order: JSON.parse(localStorageRef)});
         }
@@ -48,6 +47,24 @@ class App extends React.Component {
         })
     }
 
+    updateFish = (key, updatedFish) => {
+        //1. Take a copy of the current state
+        const fishes = {...this.state.fishes};
+        // 2. Update that state
+        fishes[key] = updatedFish;
+        // 3. Set taht to state
+        this.setState({fishes});
+    }
+
+    deleteFish = (key) => {
+        // 1. take a copy of state
+        const fishes = {...this.state.fishes};
+        // 2. update the state. Setting null is so firebase deletes it.
+        fishes[key] = null;
+        // 3. update state
+        this.setState({fishes})
+    }
+
     loadSampleFishes = () => {
         this.setState({fishes: sampleFishes})
     }
@@ -69,11 +86,20 @@ class App extends React.Component {
                 <div className="menu">
                     <Header tagline="Fresh Seafood Market" />
                     <ul className="fishes">
-                        {Object.keys(this.state.fishes).map(key => <Fish key={key} index={key} details={this.state.fishes[key]} addToOrder={this.addToOrder} /> )} 
+                        {Object.keys(this.state.fishes).map(key => <Fish key={key} index={key} 
+                        details={this.state.fishes[key]} 
+                        updateFish={this.props.updateFish}
+                        addToOrder={this.addToOrder} /> )} 
                     </ul>
                 </div>
                 <Order fishes={this.state.fishes} order={this.state.order} />
-                <Inventory addFish={this.addFish} loadSampleFishes={this.loadSampleFishes}/>
+                <Inventory 
+                    addFish={this.addFish} 
+                    loadSampleFishes={this.loadSampleFishes}
+                    fishes={this.state.fishes}
+                    updateFish = {this.updateFish}
+                    deleteFish = {this.deleteFish}
+                    />
             </div>
         )
     }
